@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Observatorio Laboral CC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Layout: mesa de consulta de expedientes; franja institucional, resumen arriba y fichas abajo */
+:root{
+  --bg:#ffffff; --panel:#f4f7fb; --sky:#e4f1fa; --fg:#14233a; --muted:#54657c; --line:#d6dfe9;
+  --navy:#12305c; --on-navy:#ffffff; --gold:#b98a1e; --gold-text:#80600f; --bar:#12305c; --warn-bg:#fdf4dc; --warn-fg:#6d5208;
+  --display:"Source Serif 4",Georgia,"Times New Roman",serif; --body:Arial,Helvetica,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1827; --panel:#16233a; --sky:#17324a; --fg:#e8eef6; --muted:#a4b3c6; --line:#2c3d57;
+  --navy:#0a1a33; --on-navy:#f3f6fb; --gold:#dcb24a; --gold-text:#e6c063; --bar:#7fa8dc; --warn-bg:#3a2f10; --warn-fg:#f0d78c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1827; --panel:#16233a; --sky:#17324a; --fg:#e8eef6; --muted:#a4b3c6; --line:#2c3d57;
+  --navy:#0a1a33; --on-navy:#f3f6fb; --gold:#dcb24a; --gold-text:#e6c063; --bar:#7fa8dc; --warn-bg:#3a2f10; --warn-fg:#f0d78c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--navy);color:var(--on-navy);border-bottom:3px solid var(--gold)}
+header .wrap{padding-block:22px 18px;display:flex;flex-direction:column;gap:6px}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:30px;line-height:1.15}
+.sub{margin:0;font-size:14px;max-width:70ch;opacity:.9}
+nav{border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav .wrap{display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:600 14px var(--body);padding:12px;cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--gold)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+main .wrap{padding-block:24px 48px;display:flex;flex-direction:column;gap:24px}
+.notice{background:var(--warn-bg);color:var(--warn-fg);padding:12px 14px;border-radius:6px;font-size:14px}
+.notice p{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel);padding:14px;border-radius:6px}
+.kpi b{display:block;font:600 30px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;color:var(--muted)}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 32px}
+.chart h3{font-size:18px;margin-bottom:10px}
+.row{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:10px;align-items:center;width:100%;background:none;border:0;color:inherit;font:inherit;padding:5px 2px;text-align:left;cursor:pointer;border-radius:4px}
+.row:hover{background:var(--panel)}
+.row .lab{font-size:13px}
+.track{display:flex;align-items:center;gap:8px;min-width:0}
+.bar{height:12px;background:var(--bar);border-radius:0 4px 4px 0;min-width:3px}
+.val{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.filters{display:grid;grid-template-columns:2fr repeat(3,1fr) auto;gap:10px;align-items:end}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+input,select{font:14px var(--body);padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg);width:100%}
+.btn{font:600 14px var(--body);padding:9px 12px;border:1px solid var(--navy);border-radius:4px;background:var(--navy);color:var(--on-navy);cursor:pointer}
+.btn.alt{background:none;color:var(--fg);border-color:var(--line)}
+.toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.toolbar strong{font-variant-numeric:tabular-nums}
+.fichas{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+details{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;padding:12px 4px;display:grid;grid-template-columns:150px 100px minmax(0,1fr) 140px;gap:12px;align-items:center;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:hover{background:var(--panel)}
+.exp{font-weight:700;font-variant-numeric:tabular-nums}
+.date{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pill{justify-self:start;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid var(--line);background:var(--panel);white-space:nowrap}
+.pill.nc{font-weight:400;color:var(--muted);border-style:dashed;background:none}
+.body{padding:2px 4px 16px;display:flex;flex-direction:column;gap:10px;max-width:80ch}
+.body p{margin:0}
+dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 12px;margin:0;font-size:14px}
+dt{color:var(--muted)}dd{margin:0}
+.alert{font-size:13px;background:var(--warn-bg);color:var(--warn-fg);padding:6px 10px;border-radius:4px}
+.body a,.note a{color:var(--gold-text);font-weight:700}
+.sky{background:var(--sky);padding:16px;border-radius:6px;display:flex;flex-direction:column;gap:6px}
+.sky p{margin:0;max-width:75ch}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted)}
+td.n{font-weight:700;font-variant-numeric:tabular-nums}
+.gloss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px}
+.gloss h3{font-size:17px}.gloss p{margin:2px 0 0;font-size:14px}
+.prose{display:flex;flex-direction:column;gap:12px;max-width:72ch}.prose p,.prose ul{margin:0}
+#csvBox{width:100%;height:120px;font:12px monospace}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.charts,.gloss{grid-template-columns:minmax(0,1fr)}.filters{grid-template-columns:minmax(0,1fr)}summary{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}summary .res{grid-column:1/-1}dl{grid-template-columns:minmax(0,1fr)}dd{margin-bottom:6px}h1{font-size:25px}}
+</style>
+
+<header><div class="wrap">
+  <h1>Observatorio Laboral CC</h1>
+  <p class="sub">Sentencias de la Corte de Constitucionalidad de Guatemala en materia laboral. Muestra de prueba: 20 fallos.</p>
+</div></header>
+<nav><div class="wrap" role="tablist">
+  <button role="tab" data-v="tablero">Tablero</button>
+  <button role="tab" data-v="directorio">Directorio</button>
+  <button role="tab" data-v="doctrina">Doctrina legal</button>
+  <button role="tab" data-v="corte">La Corte</button>
+  <button role="tab" data-v="glosario">Glosario</button>
+  <button role="tab" data-v="metodo">Fuentes y método</button>
+</div></nav>
+<main><div class="wrap" id="view"></div></main>
+
+<script>
+const V="https://gt.vlex.com/vid/sentencia-corte-constitucionalidad-expediente-", V2="https://gt.vlex.com/vid/sentencia-corte-constitucional-guatemala-";
+const NC="No consta";
+const R="Reinstalación",P="Indemnización y prestaciones",T="Tutelaridad laboral";
+const CL="Con lugar",SL="Sin lugar",PL="Parcialmente con lugar";
+const CSJ="Corte Suprema de Justicia, Cámara de Amparo y Antejuicio";
+const AP="Apelación de sentencia de amparo";
+const E="Estado de Guatemala",PI="Persona individual";
+// lectura: "completa" = encabezado y antecedentes leídos en la página; "extracto" = solo fragmentos del buscador
+const D=[
+{x:"2499-2026",f:"2026-07-02",s:CL,m:"Derecho a la tutela judicial efectiva",t:R,p:"Empresa Portuaria Nacional Santo Tomás de Castilla",tp:NC,o:NC,r:"Denuncia de despido y solicitud de reinstalación ante el juzgado de trabajo de Izabal, que ordenó reinstalar al trabajador.",u:V+"1130474322",l:"extracto"},
+{x:"1923-2026",f:"2026-07-02",s:SL,m:"Ausencia de agravio",t:P,p:E,tp:NC,o:NC,r:"Controversia sobre daños y perjuicios, incentivo y salarios dejados de percibir, según los fragmentos disponibles.",u:V+"1130474360",l:"extracto"},
+{x:"9311-2025",f:"2026-02-12",s:SL,m:"Ausencia de agravio",t:R,p:E,tp:AP,o:CSJ,r:"Reinstalación de una persona contratada en el renglón 029 del Ministerio de Agricultura, con la entidad emplazada por conflicto colectivo. El Estado alegó que era contratista y no servidora pública.",u:V+"1112675185",l:"completa",a:"Sala Quinta de Trabajo y Previsión Social"},
+{x:"8427-2025",f:"2026-02-12",s:CL,m:"Derecho de defensa",t:P,p:E,tp:AP,o:NC,r:"Condena al Estado, autoridad nominadora Ministerio de Salud, por indemnización, prestaciones, daños y perjuicios y costas.",u:V+"1112675462",l:"extracto"},
+{x:"5835-2025",f:"2025-10-09",s:SL,m:"Ausencia de agravio",t:P,p:E,tp:AP,o:NC,r:"Demanda ordinaria laboral con condena por aguinaldo, bono 14, vacaciones (art. 136 del Código de Trabajo) y otros conceptos.",u:V+"1094023488",l:"extracto"},
+{x:"2098-2024",f:"2025-04-03",s:SL,m:"Ausencia de agravio",t:R,p:E,tp:AP,o:NC,r:"Reinstalación con pago de salarios y multa, dentro de un conflicto colectivo de carácter económico social.",u:V+"1078539150",l:"extracto"},
+{x:"486-2025",f:"2025-04-03",s:CL,m:"Derecho a la tutela judicial efectiva",t:R,p:E,tp:NC,o:NC,r:"Denuncia de despido y solicitud de reinstalación ante un juzgado pluripersonal de trabajo de Guatemala.",u:V+"1078539463",l:"extracto"},
+{x:"4368-2021",f:"2021-10-26",s:NC,m:NC,t:R,p:E,tp:AP,o:CSJ,r:"Demanda laboral de una trabajadora del renglón 029 que alegó relación laboral encubierta e inamovilidad por embarazo (art. 151 literal c del Código de Trabajo).",u:V+"878087004",l:"completa",a:"Sala Tercera de Trabajo y Previsión Social"},
+{x:"699-2020",f:"2020-09-22",s:NC,m:NC,t:P,p:PI,tp:AP,o:CSJ,r:"La trabajadora reclamó indemnización. Las instancias laborales determinaron renuncia y absolvieron de indemnización, daños, perjuicios y costas.",u:V+"857281795",l:"completa",a:"Sala Primera de Trabajo y Previsión Social"},
+{x:"6781-2019",f:"2020-07-09",s:NC,m:NC,t:R,p:PI,tp:AP,o:CSJ,r:"La Sala revocó la reinstalación porque el trabajador no había laborado un año fiscal. El postulante invocó el art. 26 del Código de Trabajo y el principio in dubio pro operario.",u:V+"847295618",l:"completa",a:"Sala Primera de Trabajo y Previsión Social",d:"vLex indica 09-07-2020, pero el texto dice nueve de marzo de dos mil veinte."},
+{x:"3949-2019",f:"2020-04-20",s:NC,m:NC,t:P,p:E,tp:AP,o:CSJ,r:"Demanda ordinaria laboral de pago de indemnización por jubilación, declarada parcialmente con lugar.",u:V+"846191980",l:"completa",a:"Sala Quinta de Trabajo y Previsión Social"},
+{x:"4568-2019",f:"2020-03-24",s:NC,m:NC,t:R,p:E,tp:AP,o:CSJ,r:"Reinstalación en un hospital nacional del Ministerio de Salud. El Estado alegó que el vínculo era un contrato de servicios técnicos.",u:V+"844305199",l:"completa",a:"Sala Quinta de Trabajo y Previsión Social",d:"vLex indica 24-03-2020, pero el texto dice veinticuatro de febrero de dos mil veinte."},
+{x:"4291-2018",f:"2019-02-25",s:SL,m:"Ausencia de agravio en aplicación reiterada de jurisprudencia",t:R,p:E,tp:AP,o:CSJ,r:"Diligencias de reinstalación declaradas con lugar y confirmadas por la Sala Primera de Trabajo.",u:V+"777519633",l:"extracto",a:"Sala Primera de Trabajo y Previsión Social"},
+{x:"5433-2017",f:"2019-02-19",s:CL,m:"Derecho a la tutela judicial efectiva",t:P,p:E,tp:AP,o:NC,r:"Juicio ordinario laboral contra el Estado, entidad nominadora Ministerio de Salud, por indemnización y prestaciones.",u:V+"777528757",l:"extracto"},
+{x:"5779-2018",f:"2019-02-11",s:SL,m:"Ausencia de agravio",t:P,p:NC,tp:NC,o:NC,r:"Reclamo de indemnización, vacaciones, aguinaldo y bonificaciones, declarado con lugar en primera instancia contra el Estado.",u:V+"772499009",l:"extracto"},
+{x:"4252-2017 y 5419-2017",f:"2018-10-17",s:CL,m:"Tutelaridad de las leyes de trabajo",t:T,p:PI,tp:AP,o:NC,r:"Expedientes acumulados. Se denunció violación de in dubio pro operario e irrenunciabilidad de los derechos laborales.",u:V+"744419353",l:"extracto"},
+{x:"222-2017",f:"2018-05-08",s:CL,m:"Tutelaridad de las leyes de trabajo",t:T,p:PI,tp:AP,o:CSJ,r:"Amparo contra la Sala Primera de Trabajo, que revocó el fallo de primera instancia al declarar con lugar la apelación del demandado.",u:V2+"730373609",l:"extracto",a:"Sala Primera de Trabajo y Previsión Social"},
+{x:"3766-2016",f:"2018-02-13",s:PL,m:"Derecho de petición",t:R,p:NC,tp:AP,o:"Sala Primera de Trabajo y Previsión Social",r:"Cumplimiento de una orden de reinstalación firme, con pago de salarios y prestaciones. Se cita el art. 380 del Código de Trabajo.",u:V2+"705668185",l:"extracto"},
+{x:"4552-2017",f:"2018-01-23",s:SL,m:"Ausencia de agravio",t:R,p:NC,tp:AP,o:CSJ,r:"Demanda ordinaria laboral de reinstalación declarada con lugar contra el postulante.",u:V2+"704687425",l:"extracto"},
+{x:"6191-2016",f:"2017-11-23",s:CL,m:NC,t:P,p:NC,tp:AP,o:CSJ,r:"Sentencia de Izabal que condenó a pagar prestaciones irrenunciables, con excepción de indemnización y de daños y perjuicios; luego modificada en apelación.",u:V2+"704688469",l:"extracto"}
+];
+const yr=d=>d.f.slice(0,4), fmt=f=>f.split("-").reverse().join("-");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const count=(k,order)=>{const m={};D.forEach(d=>{const v=k(d);m[v]=(m[v]||0)+1});const e=Object.entries(m);return order?e.sort(order):e.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))};
+const st={q:"",s:"",t:"",y:""};
+const el=document.getElementById("view");
+
+function bars(title,field,rows){const mx=Math.max(...rows.map(r=>r[1]));
+  return `<section class="chart"><h3>${title}</h3>`+rows.map(([k,v])=>`<button class="row" data-f="${field}" data-k="${esc(k)}" title="${esc(k)}: ${v} de ${D.length}. Ver en el directorio"><span class="lab">${esc(k)}</span><span class="track"><span class="bar" style="width:${v/mx*80}%"></span><span class="val">${v}</span></span></button>`).join("")+`</section>`}
+
+function tablero(){
+ const y=D.map(yr).sort(), full=D.filter(d=>d.l==="completa").length, sent=D.filter(d=>d.s!==NC).length, est=D.filter(d=>d.p===E).length;
+ el.innerHTML=`
+ <div class="notice"><p><b>Muestra de prueba, no estadística.</b> Estos 20 fallos se eligieron de resultados de búsqueda. Las cifras describen solo esta muestra y no el comportamiento de la Corte.</p></div>
+ <div class="kpis">
+  <div class="kpi"><b>${D.length}</b><span>fallos cargados, ${y[0].slice(0,4)} a ${y[y.length-1].slice(0,4)}</span></div>
+  <div class="kpi"><b>${sent}</b><span>con sentido del fallo identificado</span></div>
+  <div class="kpi"><b>${est}</b><span>promovidos por el Estado de Guatemala</span></div>
+  <div class="kpi"><b>${full}</b><span>con antecedentes leídos en la fuente</span></div>
+ </div>
+ <div class="charts">
+  ${bars("Sentido del fallo","s",count(d=>d.s))}
+  ${bars("Tema","t",count(d=>d.t))}
+  ${bars("Quién promovió el amparo","p",count(d=>d.p))}
+  ${bars("Fallos por año","y",count(yr,(a,b)=>b[0]-a[0]))}
+ </div>
+ <p class="hint">Toca una barra para ver esos fallos en el directorio. «Con lugar» y «Sin lugar» se muestran como los registra la fuente y no indican por sí solos qué parte ganó.</p>`;
+}
+
+function filtered(){const q=st.q.toLowerCase();return D.filter(d=>(!st.s||d.s===st.s)&&(!st.t||d.t===st.t)&&(!st.y||yr(d)===st.y)&&(!st.p||d.p===st.p)&&(!q||[d.x,d.m,d.t,d.p,d.r,d.o,d.a||""].join(" ").toLowerCase().includes(q)))}
+const opts=(arr,cur,all)=>`<option value="">${all}</option>`+arr.map(v=>`<option${v===cur?" selected":""}>${esc(v)}</option>`).join("");
+function directorio(){
+ el.innerHTML=`<div class="filters">
+  <label for="fq">Buscar en las fichas<input id="fq" type="search" value="${esc(st.q)}" placeholder="Ej.: renglón 029, embarazo, 9311"></label>
+  <label for="fs">Sentido<select id="fs">${opts([...new Set(D.map(d=>d.s))],st.s,"Todos")}</select></label>
+  <label for="ft">Tema<select id="ft">${opts([R,P,T],st.t,"Todos")}</select></label>
+  <label for="fy">Año<select id="fy">${opts([...new Set(D.map(yr))],st.y,"Todos")}</select></label>
+  <button class="btn alt" id="clr">Limpiar</button></div>
+  <div class="toolbar"><span id="cnt"></span><button class="btn" id="csv">Copiar CSV</button></div>
+  <textarea id="csvBox" hidden aria-label="Datos en CSV"></textarea>
+  <div class="fichas" id="list"></div>`;
+ const draw=()=>{const L=filtered();
+  document.getElementById("cnt").innerHTML=`<strong>${L.length}</strong> de ${D.length} fallos${st.p?` · Promovió: ${esc(st.p)}`:""}`;
+  document.getElementById("list").innerHTML=L.length?L.map(d=>`<details><summary><span class="exp">${d.x}</span><span class="date">${fmt(d.f)}</span><span class="res">${esc(d.t)}</span><span class="pill${d.s===NC?" nc":""}">${d.s===NC?"Sentido no consta":d.s}</span></summary>
+   <div class="body"><p>${esc(d.r)}</p>${d.d?`<div class="alert">Revisar fecha: ${esc(d.d)}</div>`:""}
+   <dl><dt>Motivo registrado</dt><dd>${esc(d.m)}</dd><dt>Postulante</dt><dd>${esc(d.p)}</dd><dt>Tipo</dt><dd>${esc(d.tp)}</dd><dt>Amparo en primer grado</dt><dd>${esc(d.o)}</dd>${d.a?`<dt>Autoridad cuestionada</dt><dd>${esc(d.a)}</dd>`:""}<dt>Lectura</dt><dd>${d.l==="completa"?"Encabezado y antecedentes en la fuente, sin la parte resolutiva":"Fragmentos de la fuente"}</dd></dl>
+   <p><a href="${d.u}" target="_blank" rel="noopener">Abrir la fuente en vLex</a></p></div></details>`).join(""):`<p class="hint" style="padding:16px 0">Ningún fallo coincide. Quita un filtro o cambia la búsqueda.</p>`;};
+ const bind=(id,k)=>document.getElementById(id).addEventListener("input",e=>{st[k]=e.target.value;draw()});
+ bind("fq","q");bind("fs","s");bind("ft","t");bind("fy","y");
+ document.getElementById("clr").onclick=()=>{Object.assign(st,{q:"",s:"",t:"",y:"",p:""});directorio()};
+ document.getElementById("csv").onclick=async e=>{const c=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const txt=["Expediente,Fecha,Sentido,Motivo,Tema,Postulante,Tipo,Primer grado,Resumen,Fuente",...filtered().map(d=>[d.x,fmt(d.f),d.s,d.m,d.t,d.p,d.tp,d.o,d.r,d.u].map(c).join(","))].join("\n");
+  const b=document.getElementById("csvBox");
+  try{await navigator.clipboard.writeText(txt);e.target.textContent="CSV copiado";setTimeout(()=>e.target.textContent="Copiar CSV",1800)}
+  catch{b.hidden=false;b.value=txt;b.select()}};
+ draw();
+}
+
+function doctrina(){
+ const g={};D.filter(d=>d.s!==NC&&d.m!==NC).forEach(d=>{const base=d.m.startsWith("Ausencia de agravio")?"Ausencia de agravio":d.m;const k=d.t+"|"+d.s+"|"+base;(g[k]=g[k]||[]).push(d.x)});
+ const rows=Object.entries(g).sort((a,b)=>b[1].length-a[1].length);
+ el.innerHTML=`<div class="sky"><h2 style="font-size:20px">Tres fallos contestes</h2><p>El artículo 43 de la Ley de Amparo, Exhibición Personal y de Constitucionalidad establece que la interpretación contenida en las sentencias de la Corte sienta doctrina legal al haber tres fallos contestes. La Corte puede separarse de su jurisprudencia razonando la innovación.</p></div>
+ <p class="prose">Este cuadro agrupa los fallos por tema, sentido y motivo registrado. Coincidir en un motivo no significa sostener la misma interpretación, así que la marca de revisión es solo una alerta: confirmar doctrina legal exige leer los considerandos.</p>
+ <div class="tablebox"><table><thead><tr><th>Tema</th><th>Sentido</th><th>Motivo registrado</th><th>Fallos</th><th>Expedientes</th><th>Estado</th></tr></thead><tbody>
+ ${rows.map(([k,v])=>{const[a,b,c]=k.split("|");return `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td><td class="n">${v.length}</td><td>${v.join(", ")}</td><td>${v.length>=3?"<b>Para revisar</b>":"Menos de 3"}</td></tr>`}).join("")}
+ </tbody></table></div>
+ <p class="hint">No aparecen los fallos sin sentido o motivo identificado. El registro de 4291-2018 menciona «aplicación reiterada de jurisprudencia».</p>`;
+}
+
+function corte(){el.innerHTML=`<div class="prose"><h2 style="font-size:22px">Qué es la Corte de Constitucionalidad</h2>
+ <p>Es el tribunal permanente de jurisdicción privativa cuya función esencial es la defensa del orden constitucional (Constitución Política, art. 268).</p>
+ <p>Se integra con cinco magistrados titulares, cada uno con su suplente, y sus miembros duran cinco años en el cargo (art. 269). Sus funciones están enumeradas en el art. 272, entre ellas conocer en apelación los amparos resueltos por otros tribunales.</p>
+ <p>Una magistratura es el período de cinco años de una integración. El año de magistratura corre del 14 de abril al 13 de abril siguiente.</p>
+ <div class="sky"><h3 style="font-size:17px">Pendiente de cargar</h3><p>La lista de magistrados por período y su autoridad nominadora aún no se incluye porque falta verificarla en una fuente oficial. Muchas fichas tienen los nombres de los ponentes abreviados en la fuente, así que este tablero todavía no analiza votos ni ponencias.</p></div></div>`}
+
+const GL=[["Amparo","Garantía constitucional que protege contra amenazas o violaciones a los derechos, o los restaura cuando ya ocurrieron (Constitución Política, art. 265)."],["Postulante","Quien promueve la acción de amparo."],["Acto reclamado","La resolución o actuación contra la que se pide amparo."],["Autoridad cuestionada","El órgano que emitió el acto reclamado, por ejemplo una Sala de Trabajo."],["Apelación de sentencia de amparo","Revisión por la Corte de lo resuelto en amparo por el tribunal de primer grado."],["Ausencia de agravio","Motivo por el que se deniega el amparo cuando la Corte no advierte perjuicio a los derechos del postulante."],["Doctrina legal","Interpretación de la Corte que debe respetarse por los tribunales al haber tres fallos contestes (Ley de Amparo, art. 43)."],["Reinstalación","Orden de reincorporar al trabajador despedido sin autorización judicial cuando esta era necesaria, con pago de salarios dejados de percibir."],["Emplazamiento","Situación derivada de un conflicto colectivo en la que terminar un contrato requiere autorización del juez (Código de Trabajo, arts. 379 y 380)."],["Renglón 029","Renglón presupuestario de servicios técnicos o profesionales. Varios de estos fallos discuten si encubre una relación laboral."],["Tutelaridad","Principio por el que las leyes de trabajo protegen al trabajador (Constitución Política, art. 103)."],["In dubio pro operario","En caso de duda sobre normas de trabajo, se interpreta en el sentido más favorable al trabajador (Constitución Política, art. 106)."]];
+function glosario(){el.innerHTML=`<div class="gloss">${GL.map(([a,b])=>`<div><h3>${a}</h3><p>${b}</p></div>`).join("")}</div>`}
+
+function metodo(){el.innerHTML=`<div class="prose note"><h2 style="font-size:22px">De dónde salen los datos</h2>
+ <p>Las fichas provienen de páginas públicas de vLex Guatemala y de los fragmentos que muestran sus buscadores. Esas páginas cortan el texto antes de la parte resolutiva. No se consultó el portal de la Corte, porque no fue posible abrirlo con la herramienta de lectura usada.</p>
+ <ul><li><b>Sentido y motivo:</b> copiados del registro de vLex. Si no aparecen, la ficha indica «No consta».</li>
+ <li><b>Tema:</b> clasificación propia de esta prueba, a partir del texto disponible.</li>
+ <li><b>Postulante:</b> tomado del texto o del campo «Ponente» de vLex, que en estos registros parece contener al postulante. Los nombres de personas individuales se omiten.</li>
+ <li><b>Fecha:</b> la de vLex. Dos fichas tienen una discrepancia con el texto y quedan marcadas.</li>
+ <li><b>Resumen:</b> describe antecedentes y no expresa el criterio de la Corte.</li></ul>
+ <p>Antes de citar un fallo, cotéjalo con la sentencia oficial en el <a href="https://consultajur.cc.gob.gt/wcJur/Portal/wfConsJurCC.aspx" target="_blank" rel="noopener">portal de jurisprudencia de la Corte</a>.</p></div>`}
+
+const VIEWS={tablero,directorio,doctrina,corte,glosario,metodo};
+function go(v,push=true){if(!VIEWS[v])v="tablero";document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));VIEWS[v]();if(push)try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}
+document.querySelector("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)});
+el.addEventListener("click",e=>{const r=e.target.closest(".row");if(!r)return;Object.assign(st,{q:"",s:"",t:"",y:"",p:""});st[r.dataset.f]=r.dataset.k;go("directorio")});
+window.addEventListener("hashchange",()=>go(location.hash.slice(1),false));
+go(location.hash.slice(1)||"tablero",false);
+</script>
+
+</body>
+</html>
